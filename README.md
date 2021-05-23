@@ -1,8 +1,28 @@
-![slogan.png](https://upload-images.jianshu.io/upload_images/57036-896e7a8809a9a705.png)
+![](https://images.xiaozhuanlan.com/photo/2021/b106fd65d34a4a724244e7c5b42a2372.jpg)
 
 &nbsp;
 
 [《重学安卓》](https://xiaozhuanlan.com/kunminx)付费读者加微信进群：myatejx
+
+（Tip：**专栏不久后将调至 579 元**，有需要的小伙伴请及早上车）
+
+&nbsp;
+
+## 公告：
+
+### 2021.3
+
+很高兴有位小伙伴分享了[面试心得](https://juejin.im/pin/5f1a889151882551517ff9b2)。截至目前，专栏已对体系化文章做了 1270 余次修订，对专栏感兴趣的小伙伴可借助 [这份在 GitBook 上维护的 “导读”](https://kunminx.gitbook.io/relearn-android) 来获取它的目录 以及了解它的最新动态和发展状况。
+
+### 2020.5
+
+刚刚就本项目 "被卖课" 一事，在掘金发表了一期专访 [《开源项目被人拿去做课程卖了 1000 多万是什么体验》](https://juejin.im/post/5ecb4950518825431a669897)
+
+本项目系我为了方便开发者们 **无痛理解 Google 开源的 Jetpack MVVM 中每个架构组件的 存在缘由、职责边界**，而 **精心设计的一个又一个高频应用场景**，
+
+与此同时，本项目是作为 [《重学安卓》](https://xiaozhuanlan.com/kunminx)专栏 Jetpack MVVM 系列文章的配套项目而存在，**文章内容和项目中的代码设计均涉及本人对 Jetpack MVVM 的独家理解，本人对此享有著作权**。
+
+任何组织或个人，未经与作者本人沟通，不得将本项目的代码设计和本人对 Jetpack MVVM 的独家理解用于出书和卖课的商业用途。
 
 &nbsp;
 
@@ -39,11 +59,11 @@
 
 # 项目简介
 
-本人拥有 3 年的 移动端架构 践行和设计经验，领导团队重构的 中大型项目 多达十数个，对 Jetpack MVVM 架构在 确立规范化、标准化 开发模式 以 **减少不可预期的错误** 所作的努力，有着深入的理解。
+本人拥有 3 年的 移动端架构 践行和设计经验，领导或参与团队重构的 中大型项目 多达十数个，对 Jetpack MVVM 架构在 确立规范化、标准化 开发模式 以 **减少不可预期的错误** 所作的努力，有着深入的理解。
 
 
 
-在这个案例中，我将为你展示，Jetpack MVVM 是如何 **蕴繁于简** 地 将原本十分容易出错、一出错就会耽搁半天时间的开发工作，通过 寥寥的几行代码 轻而易举地完成。😉
+在这个案例中，我将为你展示，Jetpack MVVM 是如何 **以简驭繁** 地 将原本十分容易出错、一出错就会耽搁半天时间的开发工作，通过 寥寥的几行代码 轻而易举地完成。😉
 
 > 👆👆👆 划重点！
 
@@ -57,10 +77,10 @@
 > 我们在多个 Fragment 页面 分别安排了 **播放状态 指示器**（包括 播放暂停按钮状态、播放列表当前索引指示 等），并向你展示了 如何 以及为何 通过 [LiveData](https://xiaozhuanlan.com/topic/0168753249) **配合** 作为唯一可信源 的 [ViewModel](https://xiaozhuanlan.com/topic/6257931840) 或单例，来实现 **全应用范围内 可追溯事件 的统一分发**。
 
 
-> 我们在 Fragment 和 Activity 之间分别安排了 跨页面通信，从而向你展示 如何基于 **迪米特原则**（也称 最少知道原则）、通过 UnPeekLiveData 和 应用级 SharedViewModel 来实现 **生命周期安全的、事件源可追溯的 页面通信**（事件回调）。
+> 我们在 Fragment 和 Activity 之间分别安排了 跨页面通信，从而向你展示 如何基于 **迪米特原则**（也称 最少知道原则）、通过 UnPeekLiveData 和 应用级 SharedViewModel 来实现 **生命周期安全的、确保消息同步一致性和可靠性的 页面通信**（事件回调）。
 
 
-> 我们在 `ui.page ` 、`data.repository`、`bridge.request` 等目录下，分别安排了 视图控制器、[ViewModel](https://xiaozhuanlan.com/topic/6257931840) 、DataRepository 等 内容，从而向你展示，**单向依赖** 的架构设计，是如何通过分层的 数据请求和响应，来 **规避 内存泄漏** 等问题。
+> 我们在 `ui.page ` 、`data.repository`、`domain.request` 等目录下，分别安排了 视图控制器、[ViewModel](https://xiaozhuanlan.com/topic/6257931840) 、DataRepository 等 内容，从而向你展示，**单向依赖** 的架构设计，是如何通过分层的 数据请求和响应，来 **规避 内存泄漏** 等问题。
 
 
 > 本项目的代码一律采用 经过 ISO 认证的 标准化工业级语言 Java 来编写。并且，在上述目录 所包含的 类中，我们大都 **提供了丰富的注释**，来帮助你理解 骨架代码 为何要如此设计、如此设计能够 **在软件工程的背景下** 避免哪些不可预期的错误。
@@ -68,7 +88,7 @@
 &nbsp;
 &nbsp;
 
-除了 **在 蕴繁于简 的代码中 掌握 MVVM 最佳实践**，你还可以 从这个开源项目中 获得的内容 包括：
+除了 **在 以简驭繁 的代码中 掌握 MVVM 最佳实践**，你还可以 从这个开源项目中 获得的内容 包括：
 
 1. 整洁的代码风格 和 标准的资源命名规范。
 2. 对 视图控制器 知识点的 深入理解 和 正确使用。
@@ -98,12 +118,42 @@
 
 [AndroidSlidingUpPanel](https://github.com/umano/AndroidSlidingUpPanel)
 
-项目中使用的 图片素材 来自 [UnSplash](https://unsplash.com/) 提供的 **无版权免费图片**。
+项目中使用的 图片素材 来自 [UnSplash](https://unsplash.com/) 提供的 **免费授权图片**。
 
-项目中使用的 音频素材 来自 [BenSound](https://www.bensound.com/) 提供的 **无版权免费音乐**。
+项目中使用的 音频素材 来自 [BenSound](https://www.bensound.com/) 提供的 **免费授权音乐**。
 
 &nbsp;
 &nbsp;
+
+# Who is using
+
+感谢小伙伴们对 “开源库使用情况” 匿名调查问卷的参与，截至 2021年4月25日，我们了解到
+
+包括 “腾讯音乐、BMW、TCL” 在内的诸多知名厂商的软件，都参考过我们开源的 [Jetpack MVVM Scaffold](https://github.com/KunMinX/Jetpack-MVVM-Scaffold) 架构模式，以及正在使用我们维护的 [UnPeek-LiveData](https://github.com/KunMinX/UnPeek-LiveData) 等框架。
+
+目前我们已将具体的统计数据更新到 相关的开源库 ReadMe 中，错过本次问卷调查的小伙伴也不用担心，我们继续对此保持开放，不定期将小伙伴们登记的公司和产品更新到表格，
+
+以便吸引到更多的小伙伴 参与到对这些架构组件的 使用、反馈，集众人之所长，让架构组件得以不断演化和升级。
+
+https://wj.qq.com/s2/8362688/124a/
+
+| 集团 / 公司 / 品牌 / 团队                             | 产品               | 状态 |
+| ----------------------------------------------------- | ------------------ | ---- |
+| 腾讯音乐                                              | QQ 音乐         | 参考 |
+| TCL                                                   | 内置应用，暂时保密 | 参考 |
+| 贵州广电网络                                          | 乐播播             | 应用 |
+| 福建树叶网络科技有限公司<br/>福建天奖网络科技有限公司 | 天奖谱林           | 应用 |
+|                                                       | 小辣椒             | 应用 |
+| BMW                                                   | Speech             | 参考 |
+| 上海互教信息有限公司                                  | 知心慧学教师       | 参考 |
+| 美术宝                                                | 弹唱宝             | 参考 |
+|                                                       | 网安               | 参考 |
+| 字节跳动直播                                          | 直播 SDK           | 参考 |
+| 一加手机                                              | OPNote             | 参考 |
+
+&nbsp;
+&nbsp;
+
 
 # My Pages
 
@@ -113,16 +163,19 @@ Home：[KunMinX 的个人博客](https://www.kunminx.com/)
 
 Juejin：[KunMinX 在掘金](https://juejin.im/user/58ab0de9ac502e006975d757/posts)
 
-[《重学安卓》 专栏](https://xiaozhuanlan.com/kunminx?rel=kunminx)
+[《重学安卓》 专栏](https://xiaozhuanlan.com/kunminx)
 
 付费读者加微信进群：myatejx
 
-[![重学安卓小专栏](https://i.loli.net/2019/06/17/5d067596c2dbf49609.png)](https://xiaozhuanlan.com/kunminx?rel=kunminx)
+[![重学安卓小专栏](https://images.xiaozhuanlan.com/photo/2021/d493a54a32e38e7fbcfa68d424ebfd1e.png)](https://xiaozhuanlan.com/kunminx)
+
+&nbsp;
+&nbsp;
 
 # License
 
 ```
-Copyright 2018-2019 KunMinX
+Copyright 2019-present KunMinX
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

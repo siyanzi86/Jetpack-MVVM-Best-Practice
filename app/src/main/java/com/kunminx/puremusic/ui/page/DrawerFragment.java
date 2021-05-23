@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 KunMinX
+ * Copyright 2018-present KunMinX
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,112 +16,97 @@
 
 package com.kunminx.puremusic.ui.page;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.kunminx.architecture.ui.adapter.SimpleBaseBindingAdapter;
+import com.kunminx.architecture.ui.page.BaseFragment;
+import com.kunminx.architecture.ui.page.DataBindingConfig;
+import com.kunminx.puremusic.BR;
 import com.kunminx.puremusic.R;
-import com.kunminx.puremusic.bridge.request.InfoRequestViewModel;
-import com.kunminx.puremusic.bridge.state.DrawerViewModel;
-import com.kunminx.puremusic.data.bean.LibraryInfo;
-import com.kunminx.puremusic.databinding.AdapterLibraryBinding;
-import com.kunminx.puremusic.databinding.FragmentDrawerBinding;
-import com.kunminx.puremusic.ui.base.BaseFragment;
+import com.kunminx.puremusic.ui.page.adapter.DrawerAdapter;
+import com.kunminx.puremusic.ui.state.DrawerViewModel;
 
 /**
  * Create by KunMinX at 19/10/29
  */
 public class DrawerFragment extends BaseFragment {
 
-    private FragmentDrawerBinding mBinding;
-    private DrawerViewModel mDrawerViewModel;
-    private InfoRequestViewModel mInfoRequestViewModel;
-    private SimpleBaseBindingAdapter<LibraryInfo, AdapterLibraryBinding> mAdapter;
+    //TODO tip 1：每个页面都要单独配备一个 state-ViewModel，职责仅限于 "状态托管和恢复"，
+    //callback-ViewModel 则是用于在 "跨页面通信" 的场景下，承担 "唯一可信源"，
+
+    //如果这样说还不理解的话，详见 https://xiaozhuanlan.com/topic/8204519736
+
+    private DrawerViewModel mState;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mInfoRequestViewModel = ViewModelProviders.of(this).get(InfoRequestViewModel.class);
-        mDrawerViewModel = ViewModelProviders.of(this).get(DrawerViewModel.class);
+    protected void initViewModel() {
+        mState = getFragmentScopeViewModel(DrawerViewModel.class);
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_drawer, container, false);
-        mBinding = FragmentDrawerBinding.bind(view);
-        mBinding.setVm(mDrawerViewModel);
-        mBinding.setClick(new ClickProxy());
-        return view;
+    protected DataBindingConfig getDataBindingConfig() {
+
+        //TODO tip 1: DataBinding 严格模式：
+        // 将 DataBinding 实例限制于 base 页面中，默认不向子类暴露，
+        // 通过这样的方式，来彻底解决 视图调用的一致性问题，
+        // 如此，视图调用的安全性将和基于函数式编程思想的 Jetpack Compose 持平。
+        // 而 DataBindingConfig 就是在这样的背景下，用于为 base 页面中的 DataBinding 提供绑定项。
+
+        // 如果这样说还不理解的话，详见 https://xiaozhuanlan.com/topic/9816742350 和 https://xiaozhuanlan.com/topic/2356748910
+
+        return new DataBindingConfig(R.layout.fragment_drawer, BR.vm, mState)
+                .addBindingParam(BR.click, new ClickProxy())
+                .addBindingParam(BR.adapter, new DrawerAdapter(getContext()));
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //TODO tip1：绑定跟随视图控制器生命周期的、可叫停的、单独放在 UseCase 中处理的业务
-        getLifecycle().addObserver(mInfoRequestViewModel.getTestUseCase());
+        //TODO tip 2：将 request 作为 state-ViewModel 的成员暴露给 Activity/Fragment，
+        // 如此便于语义的明确，以及实现多个 request 在 state-ViewModel 中的组合和复用。
 
-        mAdapter = new SimpleBaseBindingAdapter<LibraryInfo, AdapterLibraryBinding>(getContext(), R.layout.adapter_library) {
-            @Override
-            protected void onSimpleBindItem(AdapterLibraryBinding binding, LibraryInfo item, RecyclerView.ViewHolder holder) {
-                binding.tvTitle.setText(item.getTitle());
-                binding.tvSummary.setText(item.getSummary());
-                binding.getRoot().setOnClickListener(v -> {
-                    Uri uri = Uri.parse(item.getUrl());
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(intent);
-                });
-            }
-        };
+        //如果这样说还不理解的话，详见《如何让同事爱上架构模式、少写 bug 多注释》的解析
+        //https://xiaozhuanlan.com/topic/8204519736
 
-        mBinding.rv.setAdapter(mAdapter);
+        mState.infoRequest.getLibraryLiveData().observe(getViewLifecycleOwner(), dataResult -> {
+            if (!dataResult.getResponseStatus().isSuccess()) return;
 
-        mInfoRequestViewModel.getLibraryLiveData().observe(this, libraryInfos -> {
-            mInitDataCame = true;
-            if (mAnimationLoaded && libraryInfos != null) {
-                mAdapter.setList(libraryInfos);
-                mAdapter.notifyDataSetChanged();
+            if (mAnimationLoaded && dataResult.getResult() != null) {
+
+                //TODO tip 3："唯一可信源"的理念仅适用于"跨域通信"的场景，
+                // state-ViewModel 与"跨域通信"的场景无关，其所持有的 LiveData 仅用于"无防抖加持"的视图状态绑定用途
+                // （也即它是用于在不适合防抖加持的场景下替代"自带防抖特性的 ObservableField"），
+                // 因而此处 LiveData 可以直接在页面内 setValue：所通知的目标不包含其他页面的状态，而是当前页内部的状态。
+
+                // 如果这样说还不理解的话，详见《LiveData》篇和《DataBinding》篇的解析
+                // https://xiaozhuanlan.com/topic/0168753249、https://xiaozhuanlan.com/topic/9816742350
+
+                mState.list.setValue(dataResult.getResult());
             }
         });
 
-        mInfoRequestViewModel.requestLibraryInfo();
-
-        mInfoRequestViewModel.getTestXXX().observe(this, s -> {
-            //TODO tip3：暂无实际功能，仅演示 UseCase 流程
-
-            //接收来自 可感知生命周期的 UseCase 处理的结果
-        });
-
-        //TODO tip2：暂无实际功能，仅演示 UseCase 流程
-        mInfoRequestViewModel.requestTestXXX();
+        if (mState.infoRequest.getLibraryLiveData().getValue() == null) {
+            mState.infoRequest.requestLibraryInfo();
+        }
     }
 
     @Override
     public void loadInitData() {
         super.loadInitData();
-        if (mInfoRequestViewModel.getLibraryLiveData().getValue() != null) {
-            mAdapter.setList(mInfoRequestViewModel.getLibraryLiveData().getValue());
-            mAdapter.notifyDataSetChanged();
+        if (mState.infoRequest.getLibraryLiveData().getValue() != null
+                && mState.infoRequest.getLibraryLiveData().getValue().getResult() != null) {
+            mState.list.setValue(mState.infoRequest.getLibraryLiveData().getValue().getResult());
         }
     }
 
     public class ClickProxy {
 
         public void logoClick() {
-            String u = "https://github.com/KunMinX/Jetpack-MVVM-Best-Practice";
-            Uri uri = Uri.parse(u);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            startActivity(intent);
+            openUrlInBrowser(getString(R.string.github_project));
         }
     }
 
